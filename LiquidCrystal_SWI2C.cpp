@@ -21,9 +21,12 @@ inline void LiquidCrystal_SWI2C::write(uint8_t value) {
 }
 
 #endif
-#include "Wire.h"
-
-
+#define SDA_PORT PORTD
+#define SDA_PIN 7
+#define SCL_PORT PORTD
+#define SCL_PIN 6
+#include <SoftWire.h>
+SoftWire Wire = SoftWire();
 
 // When the display powers up, it is configured as follows:
 //
