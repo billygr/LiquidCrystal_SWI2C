@@ -1,13 +1,13 @@
 // Based on the work by DFRobot
 
-#include "LiquidCrystal_I2C.h"
+#include "LiquidCrystal_SWI2C.h"
 #include <inttypes.h>
 #if defined(ARDUINO) && ARDUINO >= 100
 
 #include "Arduino.h"
 
 #define printIIC(args)	Wire.write(args)
-inline size_t LiquidCrystal_I2C::write(uint8_t value) {
+inline size_t LiquidCrystal_SWI2C::write(uint8_t value) {
 	send(value, Rs);
 	return 1;
 }
@@ -16,7 +16,7 @@ inline size_t LiquidCrystal_I2C::write(uint8_t value) {
 #include "WProgram.h"
 
 #define printIIC(args)	Wire.send(args)
-inline void LiquidCrystal_I2C::write(uint8_t value) {
+inline void LiquidCrystal_SWI2C::write(uint8_t value) {
 	send(value, Rs);
 }
 
@@ -44,7 +44,7 @@ inline void LiquidCrystal_I2C::write(uint8_t value) {
 // can't assume that its in that state when a sketch starts (and the
 // LiquidCrystal constructor is called).
 
-LiquidCrystal_I2C::LiquidCrystal_I2C(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows)
+LiquidCrystal_SWI2C::LiquidCrystal_SWI2C(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows)
 {
   _Addr = lcd_Addr;
   _cols = lcd_cols;
@@ -52,18 +52,18 @@ LiquidCrystal_I2C::LiquidCrystal_I2C(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t l
   _backlightval = LCD_NOBACKLIGHT;
 }
 
-void LiquidCrystal_I2C::init(){
+void LiquidCrystal_SWI2C::init(){
 	init_priv();
 }
 
-void LiquidCrystal_I2C::init_priv()
+void LiquidCrystal_SWI2C::init_priv()
 {
 	Wire.begin();
 	_displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
 	begin(_cols, _rows);  
 }
 
-void LiquidCrystal_I2C::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
+void LiquidCrystal_SWI2C::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
 	if (lines > 1) {
 		_displayfunction |= LCD_2LINE;
 	}
@@ -124,17 +124,17 @@ void LiquidCrystal_I2C::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
 }
 
 /********** high level commands, for the user! */
-void LiquidCrystal_I2C::clear(){
+void LiquidCrystal_SWI2C::clear(){
 	command(LCD_CLEARDISPLAY);// clear display, set cursor position to zero
 	delayMicroseconds(2000);  // this command takes a long time!
 }
 
-void LiquidCrystal_I2C::home(){
+void LiquidCrystal_SWI2C::home(){
 	command(LCD_RETURNHOME);  // set cursor position to zero
 	delayMicroseconds(2000);  // this command takes a long time!
 }
 
-void LiquidCrystal_I2C::setCursor(uint8_t col, uint8_t row){
+void LiquidCrystal_SWI2C::setCursor(uint8_t col, uint8_t row){
 	int row_offsets[] = { 0x00, 0x40, 0x14, 0x54 };
 	if ( row > _numlines ) {
 		row = _numlines-1;    // we count rows starting w/0
@@ -143,70 +143,70 @@ void LiquidCrystal_I2C::setCursor(uint8_t col, uint8_t row){
 }
 
 // Turn the display on/off (quickly)
-void LiquidCrystal_I2C::noDisplay() {
+void LiquidCrystal_SWI2C::noDisplay() {
 	_displaycontrol &= ~LCD_DISPLAYON;
 	command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
-void LiquidCrystal_I2C::display() {
+void LiquidCrystal_SWI2C::display() {
 	_displaycontrol |= LCD_DISPLAYON;
 	command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
 // Turns the underline cursor on/off
-void LiquidCrystal_I2C::noCursor() {
+void LiquidCrystal_SWI2C::noCursor() {
 	_displaycontrol &= ~LCD_CURSORON;
 	command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
-void LiquidCrystal_I2C::cursor() {
+void LiquidCrystal_SWI2C::cursor() {
 	_displaycontrol |= LCD_CURSORON;
 	command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
 // Turn on and off the blinking cursor
-void LiquidCrystal_I2C::noBlink() {
+void LiquidCrystal_SWI2C::noBlink() {
 	_displaycontrol &= ~LCD_BLINKON;
 	command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
-void LiquidCrystal_I2C::blink() {
+void LiquidCrystal_SWI2C::blink() {
 	_displaycontrol |= LCD_BLINKON;
 	command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
 // These commands scroll the display without changing the RAM
-void LiquidCrystal_I2C::scrollDisplayLeft(void) {
+void LiquidCrystal_SWI2C::scrollDisplayLeft(void) {
 	command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT);
 }
-void LiquidCrystal_I2C::scrollDisplayRight(void) {
+void LiquidCrystal_SWI2C::scrollDisplayRight(void) {
 	command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT);
 }
 
 // This is for text that flows Left to Right
-void LiquidCrystal_I2C::leftToRight(void) {
+void LiquidCrystal_SWI2C::leftToRight(void) {
 	_displaymode |= LCD_ENTRYLEFT;
 	command(LCD_ENTRYMODESET | _displaymode);
 }
 
 // This is for text that flows Right to Left
-void LiquidCrystal_I2C::rightToLeft(void) {
+void LiquidCrystal_SWI2C::rightToLeft(void) {
 	_displaymode &= ~LCD_ENTRYLEFT;
 	command(LCD_ENTRYMODESET | _displaymode);
 }
 
 // This will 'right justify' text from the cursor
-void LiquidCrystal_I2C::autoscroll(void) {
+void LiquidCrystal_SWI2C::autoscroll(void) {
 	_displaymode |= LCD_ENTRYSHIFTINCREMENT;
 	command(LCD_ENTRYMODESET | _displaymode);
 }
 
 // This will 'left justify' text from the cursor
-void LiquidCrystal_I2C::noAutoscroll(void) {
+void LiquidCrystal_SWI2C::noAutoscroll(void) {
 	_displaymode &= ~LCD_ENTRYSHIFTINCREMENT;
 	command(LCD_ENTRYMODESET | _displaymode);
 }
 
 // Allows us to fill the first 8 CGRAM locations
 // with custom characters
-void LiquidCrystal_I2C::createChar(uint8_t location, uint8_t charmap[]) {
+void LiquidCrystal_SWI2C::createChar(uint8_t location, uint8_t charmap[]) {
 	location &= 0x7; // we only have 8 locations 0-7
 	command(LCD_SETCGRAMADDR | (location << 3));
 	for (int i=0; i<8; i++) {
@@ -215,12 +215,12 @@ void LiquidCrystal_I2C::createChar(uint8_t location, uint8_t charmap[]) {
 }
 
 // Turn the (optional) backlight off/on
-void LiquidCrystal_I2C::noBacklight(void) {
+void LiquidCrystal_SWI2C::noBacklight(void) {
 	_backlightval=LCD_NOBACKLIGHT;
 	expanderWrite(0);
 }
 
-void LiquidCrystal_I2C::backlight(void) {
+void LiquidCrystal_SWI2C::backlight(void) {
 	_backlightval=LCD_BACKLIGHT;
 	expanderWrite(0);
 }
@@ -229,7 +229,7 @@ void LiquidCrystal_I2C::backlight(void) {
 
 /*********** mid level commands, for sending data/cmds */
 
-inline void LiquidCrystal_I2C::command(uint8_t value) {
+inline void LiquidCrystal_SWI2C::command(uint8_t value) {
 	send(value, 0);
 }
 
@@ -237,25 +237,25 @@ inline void LiquidCrystal_I2C::command(uint8_t value) {
 /************ low level data pushing commands **********/
 
 // write either command or data
-void LiquidCrystal_I2C::send(uint8_t value, uint8_t mode) {
+void LiquidCrystal_SWI2C::send(uint8_t value, uint8_t mode) {
 	uint8_t highnib=value&0xf0;
 	uint8_t lownib=(value<<4)&0xf0;
        write4bits((highnib)|mode);
 	write4bits((lownib)|mode); 
 }
 
-void LiquidCrystal_I2C::write4bits(uint8_t value) {
+void LiquidCrystal_SWI2C::write4bits(uint8_t value) {
 	expanderWrite(value);
 	pulseEnable(value);
 }
 
-void LiquidCrystal_I2C::expanderWrite(uint8_t _data){                                        
+void LiquidCrystal_SWI2C::expanderWrite(uint8_t _data){                                        
 	Wire.beginTransmission(_Addr);
 	printIIC((int)(_data) | _backlightval);
 	Wire.endTransmission();   
 }
 
-void LiquidCrystal_I2C::pulseEnable(uint8_t _data){
+void LiquidCrystal_SWI2C::pulseEnable(uint8_t _data){
 	expanderWrite(_data | En);	// En high
 	delayMicroseconds(1);		// enable pulse must be >450ns
 	
@@ -266,27 +266,27 @@ void LiquidCrystal_I2C::pulseEnable(uint8_t _data){
 
 // Alias functions
 
-void LiquidCrystal_I2C::cursor_on(){
+void LiquidCrystal_SWI2C::cursor_on(){
 	cursor();
 }
 
-void LiquidCrystal_I2C::cursor_off(){
+void LiquidCrystal_SWI2C::cursor_off(){
 	noCursor();
 }
 
-void LiquidCrystal_I2C::blink_on(){
+void LiquidCrystal_SWI2C::blink_on(){
 	blink();
 }
 
-void LiquidCrystal_I2C::blink_off(){
+void LiquidCrystal_SWI2C::blink_off(){
 	noBlink();
 }
 
-void LiquidCrystal_I2C::load_custom_character(uint8_t char_num, uint8_t *rows){
+void LiquidCrystal_SWI2C::load_custom_character(uint8_t char_num, uint8_t *rows){
 		createChar(char_num, rows);
 }
 
-void LiquidCrystal_I2C::setBacklight(uint8_t new_val){
+void LiquidCrystal_SWI2C::setBacklight(uint8_t new_val){
 	if(new_val){
 		backlight();		// turn backlight on
 	}else{
@@ -294,7 +294,7 @@ void LiquidCrystal_I2C::setBacklight(uint8_t new_val){
 	}
 }
 
-void LiquidCrystal_I2C::printstr(const char c[]){
+void LiquidCrystal_SWI2C::printstr(const char c[]){
 	//This function is not identical to the function used for "real" I2C displays
 	//it's here so the user sketch doesn't have to be changed 
 	print(c);
@@ -302,14 +302,14 @@ void LiquidCrystal_I2C::printstr(const char c[]){
 
 
 // unsupported API functions
-void LiquidCrystal_I2C::off(){}
-void LiquidCrystal_I2C::on(){}
-void LiquidCrystal_I2C::setDelay (int cmdDelay,int charDelay) {}
-uint8_t LiquidCrystal_I2C::status(){return 0;}
-uint8_t LiquidCrystal_I2C::keypad (){return 0;}
-uint8_t LiquidCrystal_I2C::init_bargraph(uint8_t graphtype){return 0;}
-void LiquidCrystal_I2C::draw_horizontal_graph(uint8_t row, uint8_t column, uint8_t len,  uint8_t pixel_col_end){}
-void LiquidCrystal_I2C::draw_vertical_graph(uint8_t row, uint8_t column, uint8_t len,  uint8_t pixel_row_end){}
-void LiquidCrystal_I2C::setContrast(uint8_t new_val){}
+void LiquidCrystal_SWI2C::off(){}
+void LiquidCrystal_SWI2C::on(){}
+void LiquidCrystal_SWI2C::setDelay (int cmdDelay,int charDelay) {}
+uint8_t LiquidCrystal_SWI2C::status(){return 0;}
+uint8_t LiquidCrystal_SWI2C::keypad (){return 0;}
+uint8_t LiquidCrystal_SWI2C::init_bargraph(uint8_t graphtype){return 0;}
+void LiquidCrystal_SWI2C::draw_horizontal_graph(uint8_t row, uint8_t column, uint8_t len,  uint8_t pixel_col_end){}
+void LiquidCrystal_SWI2C::draw_vertical_graph(uint8_t row, uint8_t column, uint8_t len,  uint8_t pixel_row_end){}
+void LiquidCrystal_SWI2C::setContrast(uint8_t new_val){}
 
 	
